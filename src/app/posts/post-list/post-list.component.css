@@ -10,3 +10,17 @@
 mat-spinner {
   margin: auto;
 }
+
+.post-image {
+  height: 7rem;
+  margin: 1rem 0;
+}
+
+.post-image img {
+  height: 100%;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+mat-paginator {
+  margin-top: 1rem;
+}
