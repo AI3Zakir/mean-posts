@@ -3,6 +3,7 @@ import { Post } from '../post.model';
 import { PostsService } from '../posts.service';
 import { Subscription } from 'rxjs';
 import { PageEvent } from '@angular/material';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-post-list',
@@ -11,17 +12,24 @@ import { PageEvent } from '@angular/material';
 })
 export class PostListComponent implements OnInit, OnDestroy {
   private postsSubscription: Subscription;
+  private authListenerSubscription: Subscription;
   posts: Post[] = [];
   totalPosts = 10;
   isLoading = false;
   postsPerPage = 2;
   page = 1;
   pageSizeOptions = [1, 2, 5, 10];
+  userIsAuthenticated: boolean;
 
-  constructor(public postsService: PostsService) {}
+  constructor(public postsService: PostsService, private authService: AuthService) {}
 
   ngOnInit() {
+    this.userIsAuthenticated = this.authService.getAuthenticationStatus();
     this.isLoading = true;
+    this.authListenerSubscription = this.authService.getAuthStatusListener()
+      .subscribe((isAuthenticated) => {
+        this.userIsAuthenticated = isAuthenticated;
+      });
     this.postsService.getPosts(this.postsPerPage, this.page);
     this.postsSubscription = this.postsService.getPostUpdateListener().subscribe(
       (postData: {posts: Post[], count: number}) => {
@@ -30,10 +38,12 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.totalPosts = postData.count;
       }
     );
+
   }
 
   ngOnDestroy(): void {
     this.postsSubscription.unsubscribe();
+    this.authListenerSubscription.unsubscribe();
   }
 
   onDeletePost(id: string) {
