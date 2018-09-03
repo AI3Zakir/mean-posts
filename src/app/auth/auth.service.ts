@@ -41,9 +41,11 @@ export class AuthService {
 
   createUser(email: string, password: string) {
     const authData: AuthData = {email: email, password: password};
-    this.httpClinet.post('http://localhost:3000/api/users/signup', authData)
+    return this.httpClinet.post('http://localhost:3000/api/users/signup', authData)
       .subscribe((response) => {
-        console.log(response);
+        this.router.navigate(['/']);
+      }, (error) => {
+        this.authStatusListener.next(false);
       });
   }
 
@@ -64,7 +66,9 @@ export class AuthService {
           this.saveAuthData( this.token, expirationDate, this.user);
           this.router.navigate(['/']);
         }
-      });
+      },(error) => {
+        this.authStatusListener.next(false);
+      } );
   }
 
   logout() {

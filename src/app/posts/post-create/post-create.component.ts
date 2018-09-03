@@ -1,25 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { PostsService } from '../posts.service';
 import { Post } from '../post.model';
 import { mimeType } from './mime-type.validator';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-post-create',
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css']
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
 
   private mode = 'CREATE';
   private id: string;
+  private authStatusSubscription: Subscription;
   post: Post;
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
 
-  constructor(public postsService: PostsService, public route: ActivatedRoute) {}
+  constructor(public postsService: PostsService,
+              public route: ActivatedRoute,
+              private authService: AuthService) {}
 
   onSavePost() {
     if (this.form.invalid) {
@@ -66,6 +71,10 @@ export class PostCreateComponent implements OnInit {
         this.id = null;
       }
     });
+    this.authStatusSubscription = this.authService.getAuthStatusListener()
+      .subscribe((authStatus) => {
+        this.isLoading = false;
+      });
   }
 
   onImageUpload(event: Event) {
@@ -77,5 +86,9 @@ export class PostCreateComponent implements OnInit {
       this.imagePreview = reader.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  ngOnDestroy(): void {
+    this.authStatusSubscription.unsubscribe();
   }
 }
