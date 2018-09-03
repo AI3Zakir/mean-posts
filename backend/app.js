@@ -8,7 +8,7 @@ const usersRoutes = require('./routes/users');
 
 const app = express();
 
-mongoose.connect("mongodb+srv://user:GVFnEQ8ZJBi7c9Jq@meanapp-bsxii.mongodb.net/test?retryWrites=true", { useNewUrlParser: true }).then(() => {
+mongoose.connect("mongodb+srv://" + process.env.MONGO_ATLAS_USER + ":" + process.env.MONGO_ATLAS_PW + "@meanapp-bsxii.mongodb.net/test?retryWrites=true", { useNewUrlParser: true }).then(() => {
   console.log('Succesfully connected to MongoDB')
 }).catch((error) => {
   console.log(error);

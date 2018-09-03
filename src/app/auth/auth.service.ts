@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { AuthData } from './auth-data.model';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { tryParse } from 'selenium-webdriver/http';
 import { User } from './user.model';
+import { environment } from '../../environments/environment';
 
+const AUTH_API_URL = environment.apiUrl + '/users';
 @Injectable({
   providedIn: 'root'
 })
@@ -41,7 +42,7 @@ export class AuthService {
 
   createUser(email: string, password: string) {
     const authData: AuthData = {email: email, password: password};
-    return this.httpClinet.post('http://localhost:3000/api/users/signup', authData)
+    return this.httpClinet.post( AUTH_API_URL + '/signup', authData)
       .subscribe((response) => {
         this.router.navigate(['/']);
       }, (error) => {
@@ -51,7 +52,7 @@ export class AuthService {
 
   login(email: string, password: string) {
     const authData: AuthData = {email: email, password: password};
-    this.httpClinet.post<{token: string, expiresIn: number, user: User}>('http://localhost:3000/api/users/login', authData)
+    this.httpClinet.post<{token: string, expiresIn: number, user: User}>(AUTH_API_URL + '/login', authData)
       .subscribe((response) => {
         this.token = response.token;
         if (this.token) {
