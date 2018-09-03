@@ -4,6 +4,7 @@ import { PostsService } from '../posts.service';
 import { Subscription } from 'rxjs';
 import { PageEvent } from '@angular/material';
 import { AuthService } from '../../auth/auth.service';
+import { User } from '../../auth/user.model';
 
 @Component({
   selector: 'app-post-list',
@@ -13,6 +14,7 @@ import { AuthService } from '../../auth/auth.service';
 export class PostListComponent implements OnInit, OnDestroy {
   private postsSubscription: Subscription;
   private authListenerSubscription: Subscription;
+  private currentUserSubscription: Subscription;
   posts: Post[] = [];
   totalPosts = 10;
   isLoading = false;
@@ -20,30 +22,41 @@ export class PostListComponent implements OnInit, OnDestroy {
   page = 1;
   pageSizeOptions = [1, 2, 5, 10];
   userIsAuthenticated: boolean;
+  currentUser: User;
 
-  constructor(public postsService: PostsService, private authService: AuthService) {}
+  constructor(public postsService: PostsService, private authService: AuthService) {
+  }
 
   ngOnInit() {
     this.userIsAuthenticated = this.authService.getAuthenticationStatus();
+    this.currentUser = this.authService.getCurrentUser();
     this.isLoading = true;
+    this.postsSubscription = this.postsService.getPostUpdateListener()
+      .subscribe(
+        (postData: { posts: Post[], count: number }) => {
+          this.isLoading = false;
+          this.posts = postData.posts;
+          this.totalPosts = postData.count;
+        }
+      );
     this.authListenerSubscription = this.authService.getAuthStatusListener()
       .subscribe((isAuthenticated) => {
         this.userIsAuthenticated = isAuthenticated;
+        this.currentUser = this.authService.getCurrentUser();
+      });
+    this.currentUserSubscription = this.authService.getCurrentUserListener()
+      .subscribe((user) => {
+        this.currentUser = user;
       });
     this.postsService.getPosts(this.postsPerPage, this.page);
-    this.postsSubscription = this.postsService.getPostUpdateListener().subscribe(
-      (postData: {posts: Post[], count: number}) => {
-        this.isLoading = false;
-        this.posts = postData.posts;
-        this.totalPosts = postData.count;
-      }
-    );
+
 
   }
 
   ngOnDestroy(): void {
     this.postsSubscription.unsubscribe();
     this.authListenerSubscription.unsubscribe();
+    this.currentUserSubscription.unsubscribe();
   }
 
   onDeletePost(id: string) {

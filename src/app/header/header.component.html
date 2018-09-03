@@ -14,5 +14,8 @@
     <li *ngIf="userIsAuthenticated">
       <button mat-button (click)="onLogout()">Logout</button>
     </li>
+    <li *ngIf="userIsAuthenticated">
+      <button mat-button>| Logged in as {{ currentUser?.email }}</button>
+    </li>
   </ul>
 </mat-toolbar>
