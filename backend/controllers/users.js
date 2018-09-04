@@ -1,27 +1,35 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const Users = require('../models/user');
 
 exports.createUser = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10).then((hash) => {
-    const user = new Users({
-      email: req.body.email,
-      password: hash
-    });
-    user.save()
-      .then((result) => {
-        res.status(201).json({
-          message: 'Users Created',
-          result: result
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          message: 'Unable to create user with given credentials'
-        })
-      })
+  const user = new Users({
+    email: req.body.email,
+    password: req.body.password
   });
+  user.save()
+    .then((result) => {
+      const token = jwt.sign(
+        {
+          email: user.email,
+          userId: user._id
+        },
+        process.env.JWT_KEY,
+        {
+          expiresIn: '1h'
+        });
+      res.status(201).json({
+        message: 'Users Created',
+        result: result,
+        token: token
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: 'Unable to create user with given credentials'
+      })
+    })
 };
+
 exports.loginUser = (req, res, next) => {
   let fetchedUser;
   Users.findOne({email: req.body.email})
@@ -32,7 +40,7 @@ exports.loginUser = (req, res, next) => {
         });
       }
       fetchedUser = user;
-      return bcrypt.compare(req.body.password, user.password)
+      return user.comparePassword(req.body.password)
     })
     .then((result) => {
       if (!result) {

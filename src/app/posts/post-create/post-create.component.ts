@@ -6,6 +6,7 @@ import { Post } from '../post.model';
 import { mimeType } from './mime-type.validator';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-post-create',
@@ -21,6 +22,7 @@ export class PostCreateComponent implements OnInit, OnDestroy {
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
+  serverUrl = environment.apiUrl;
 
   constructor(public postsService: PostsService,
               public route: ActivatedRoute,
@@ -64,7 +66,7 @@ export class PostCreateComponent implements OnInit, OnDestroy {
             'content': this.post.content,
             'image': this.post.imagePath
           });
-          this.imagePreview = this.post.imagePath;
+          this.imagePreview = this.serverUrl + this.post.imagePath;
         });
       } else {
         this.mode = 'CREATE';

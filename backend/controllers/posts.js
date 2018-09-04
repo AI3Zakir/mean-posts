@@ -6,7 +6,7 @@ exports.createPost = (req, res, next) => {
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
-    imagePath: url + "/images/" + req.file.filename,
+    imagePath: "/images/" + req.file.filename,
     user: req.userData.userId
   });
   post.save()
@@ -72,7 +72,7 @@ exports.updatePost = (req, res, next) => {
   if (req.file) {
     const url = req.protocol + '://' + req.get('host');
 
-    imagePath = url + "/images/" + req.file.filename;
+    imagePath = "/images/" + req.file.filename;
   }
   const post = new Post({
     _id: req.body.id,

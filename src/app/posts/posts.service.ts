@@ -6,7 +6,7 @@ import { count, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-const POSTS_API_URL = environment.apiUrl + '/posts';
+const POSTS_API_URL = environment.apiUrl + '/api/posts';
 
 @Injectable({
   providedIn: 'root'

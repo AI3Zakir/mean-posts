@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { User } from './user.model';
 import { environment } from '../../environments/environment';
 
-const AUTH_API_URL = environment.apiUrl + '/users';
+const AUTH_API_URL = environment.apiUrl + '/api/users';
 @Injectable({
   providedIn: 'root'
 })
@@ -44,6 +44,7 @@ export class AuthService {
     const authData: AuthData = {email: email, password: password};
     return this.httpClinet.post( AUTH_API_URL + '/signup', authData)
       .subscribe((response) => {
+        this.login(email, password);
         this.router.navigate(['/']);
       }, (error) => {
         this.authStatusListener.next(false);

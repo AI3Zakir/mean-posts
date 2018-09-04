@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { PageEvent } from '@angular/material';
 import { AuthService } from '../../auth/auth.service';
 import { User } from '../../auth/user.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-post-list',
@@ -23,6 +24,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   pageSizeOptions = [1, 2, 5, 10];
   userIsAuthenticated: boolean;
   currentUser: User;
+  serverUrl = environment.apiUrl;
 
   constructor(public postsService: PostsService, private authService: AuthService) {
   }
